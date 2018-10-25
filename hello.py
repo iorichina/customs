@@ -41,7 +41,6 @@ for page_index in range(2, total_page + 1):
     document = BeautifulSoup(response.text, 'html.parser')
     print(str(page_index)+'. 第' + document.select(
         '#ess_ctr182767_TariffContentSearch_gvSearch_ctl23_lblCurrentPage')[0].string + '页')
-    page67735.exportTitle(document)
     page67735.exportPage(document)
 
 page67735.finish()
