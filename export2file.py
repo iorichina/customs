@@ -1,10 +1,13 @@
 class export2file():
-    def init(self, filename):
-        self.filename = open(filename, "w", encoding='utf-8')
+    def init(self, filename, codestyle):
+        self.codestyle = codestyle
+        self.filename = open(filename, "w", encoding=codestyle)
 
-    def write(self, str):
-        # print('write', str)
-        self.filename.write(str)
+    def write(self, strval):
+        # print('write', strval, strval.encode(
+        #     self.codestyle, 'ignore').decode(self.codestyle))
+        self.filename.write(strval.encode(
+            self.codestyle, 'ignore').decode(self.codestyle))
 
     def close(self):
         self.filename.flush()

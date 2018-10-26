@@ -1,3 +1,4 @@
+import sys
 import page67735
 import requests
 from bs4 import BeautifulSoup
@@ -14,15 +15,20 @@ document = BeautifulSoup(response.text, 'html.parser')
 total_page_str = document.select(
     '#ess_ctr182767_TariffContentSearch_gvSearch_ctl23_lblPageCount')[0].string
 print('共'+total_page_str+'页')
-print('1. 第' + document.select('#ess_ctr182767_TariffContentSearch_gvSearch_ctl23_lblCurrentPage')
-      [0].string + '页')
-
-page67735.exportTitle(document)
-page67735.exportPage(document)
 
 page_headers = page67735.getFormHeaders()
+from_page = 1
 total_page = int(total_page_str)
-for page_index in range(2, total_page + 1):
+if len(sys.argv) > 1 and int(sys.argv[1]) > 0:
+    from_page = int(sys.argv[1])
+if len(sys.argv) > 2 and int(sys.argv[2]) > 0:
+    total_page = int(sys.argv[2])
+if len(sys.argv) > 3:
+    page67735.setCsvFormat(sys.argv[3])
+
+page67735.exportTitle(document)
+
+for page_index in range(from_page, total_page + 1):
     page_body = page67735.getFormBody(page_index)
     try:
         response = page_session.post(

@@ -3,9 +3,62 @@
 import export2file
 
 csv_file = export2file.export2file()
-csv_file.init("customs67735.csv")
+csv_file.init("customs67735.csv", 'gbk')
 boundary = '----WebKitFormBoundaryXVBkrQ2Hq3TUBnAG'
 boundary_form = '--' + boundary
+# source or excel
+csv_format = 'excel'
+
+
+def setCsvFormat(csv_f):
+    global csv_format
+    csv_format = csv_f
+
+
+def exportTitle(document):
+    global csv_format
+    # print('exportTitle')
+    selecterth = '#ess_ctr182767_TariffContentSearch_gvSearch > tr.headStyle > th'
+    # print(document.select(selecterth))
+    title = '页码'
+    for thidx in range(1, 7):
+        thstr = document.select(
+            selecterth + ':nth-of-type('+str(thidx)+')')[0].string
+        if "excel" == csv_format and thstr.startswith('-'):
+            title += ',="' + thstr + '"'
+        else:
+            title += ','+thstr
+    title += '\n'
+    csv_file.write(title)
+
+
+def exportPage(document):
+    global csv_format
+    # print('exportPage')
+    selectertr = '#ess_ctr182767_TariffContentSearch_gvSearch > tr'
+    for tr in document.select(selectertr):
+        if 'class' in tr.attrs and 'headStyle' in tr.attrs['class']:
+            pass
+        else:
+            if len(tr.select('td')) <= 1:
+                pass
+            else:
+                # print(tr)
+                selecterpageindex = '#ess_ctr182767_TariffContentSearch_gvSearch_ctl23_lblCurrentPage'
+                selectertd = 'td:nth-of-type'
+                content = document.select(selecterpageindex)[0].string
+                for tdidx in range(1, 7):
+                    tdstr = tr.select(selectertd+'('+str(tdidx)+')')[0].string
+                    if "excel" == csv_format and tdstr.startswith('-'):
+                        content += ',="' + tdstr + '"'
+                    else:
+                        content += ',' + tdstr
+                content += '\n'
+                csv_file.write(content)
+
+
+def finish():
+    csv_file.close()
 
 
 def getFormHeaders():
@@ -101,44 +154,3 @@ Content-Disposition: form-data; name="select8"
 媒体
 '''+boundary_form+'--'
     return body
-
-
-def exportTitle(document):
-    # print('exportTitle')
-    selecterth = '#ess_ctr182767_TariffContentSearch_gvSearch > tr.headStyle > th'
-    # print(document.select(selecterth))
-    title = '页码,'
-    title += document.select(selecterth+':nth-of-type(1)')[0].string + ','
-    title += document.select(selecterth+':nth-of-type(2)')[0].string + ','
-    title += document.select(selecterth+':nth-of-type(3)')[0].string + ','
-    title += document.select(selecterth+':nth-of-type(4)')[0].string + ','
-    title += document.select(selecterth+':nth-of-type(5)')[0].string + ','
-    title += document.select(selecterth+':nth-of-type(6)')[0].string + '\n'
-    csv_file.write(title)
-
-
-def exportPage(document):
-    # print('exportPage')
-    selectertr = '#ess_ctr182767_TariffContentSearch_gvSearch > tr'
-    for tr in document.select(selectertr):
-        if 'class' in tr.attrs and 'headStyle' in tr.attrs['class']:
-            pass
-        else:
-            if len(tr.select('td')) <= 1:
-                pass
-            else:
-                # print(tr)
-                selecterpageindex = '#ess_ctr182767_TariffContentSearch_gvSearch_ctl23_lblCurrentPage'
-                selectertd = 'td:nth-of-type'
-                content = document.select(selecterpageindex)[0].string + ','
-                content += tr.select(selectertd+'(1)')[0].string + ','
-                content += tr.select(selectertd+'(2)')[0].string + ','
-                content += tr.select(selectertd+'(3)')[0].string + ','
-                content += tr.select(selectertd+'(4)')[0].string + ','
-                content += tr.select(selectertd+'(5)')[0].string + ','
-                content += tr.select(selectertd+'(6)')[0].string + '\n'
-                csv_file.write(content)
-
-
-def finish():
-    csv_file.close()
